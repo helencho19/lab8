@@ -118,19 +118,21 @@ module MakeInterval (Endpoint : ORDERED_TYPE) =
     (* intersect intvl1 intvl2 -- Returns the intersection of `intvl1`
        and `intvl2` *)
     let intersect (intvl1 : interval) (intvl2 : interval) : interval =
-      match intvl1, intvl2 with
-      |(Empty, _)
-      |(_, Empty) -> Empty
-      |(Interval (low1, high1) , Interval (low2, high2)) -> 
-        if contains intvl2 low1 && contains intvl2 high1 
-        then intvl1
-        else if contains intvl2 low1 && not (contains intvl2 high1)
-        then Interval (low1, high2)
-        else if not (contains intvl2 low1) && contains intvl2 high1
-        then Interval (low2, high1)
-        else if not (contains intvl2 low1) && not (contains intvl2 high1)
-        then intvl2
-        else Empty 
+      if is_empty intvl1 || is_empty intvl2 then Empty 
+      else 
+        match intvl1, intvl2 with
+        |(Empty, _)
+        |(_, Empty) -> Empty
+        |(Interval (low1, high1) , Interval (low2, high2)) -> 
+          if contains intvl2 low1 
+            then 
+              if contains intvl2 high1 then intvl1 
+              else Interval (low1, high2) 
+          else if not (contains intvl2 low1)
+            then 
+              if contains intvl2 high1 then Interval (low2, high1)
+              else intvl2 
+          else Empty   
     end ;;
 
 (*......................................................................
